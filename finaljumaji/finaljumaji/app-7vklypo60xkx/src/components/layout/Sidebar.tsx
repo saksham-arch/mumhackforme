@@ -3,17 +3,37 @@ import { useAuth } from 'miaoda-auth-react';
 import {
   LayoutDashboard,
   Wallet,
+  DollarSign,
+  CreditCard,
+  Target,
   Users,
+  LineChart,
+  Receipt,
+  Calculator,
+  TrendingUp,
+  PieChart,
   Sparkles,
+  MessageSquare,
+  Shield,
   Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { icon: LayoutDashboard, path: '/dashboard', label: 'Dashboard' },
-  { icon: Wallet, path: '/money', label: 'Finances' },
-  { icon: Users, path: '/family', label: 'Family & Investments' },
+  { icon: Wallet, path: '/my-money', label: 'My Money' },
+  { icon: DollarSign, path: '/money', label: 'Finances' },
+  { icon: CreditCard, path: '/bills', label: 'Bills' },
+  { icon: Target, path: '/goals', label: 'Goals' },
+  { icon: Users, path: '/family', label: 'Family Members' },
+  { icon: LineChart, path: '/investments', label: 'Investments' },
+  { icon: Receipt, path: '/receipt-scanner', label: 'Receipt Scanner' },
+  { icon: Calculator, path: '/budget-generator', label: 'Budget Generator' },
+  { icon: TrendingUp, path: '/spending-forecast', label: 'Spending Forecast' },
+  { icon: PieChart, path: '/monthly-reports', label: 'Monthly Reports' },
   { icon: Sparkles, path: '/alerts', label: 'AI Insights' },
+  { icon: MessageSquare, path: '/advice-history', label: 'Advice History' },
+  { icon: Shield, path: '/safety-logs', label: 'Safety Logs' },
   { icon: Settings, path: '/settings', label: 'Settings' },
 ];
 
@@ -37,7 +57,9 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-1 px-4 py-6 flex-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+          const isActive =
+            location.pathname === item.path ||
+            location.pathname.startsWith(`${item.path}/`);
 
           return (
             <Link

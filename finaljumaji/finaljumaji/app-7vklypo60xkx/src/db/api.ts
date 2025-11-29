@@ -1,4 +1,6 @@
-import { supabase } from './supabase';
+import { isDemoMode } from '@/config/demo';
+import { demoData } from '@/db/demoData';
+import { getSupabaseClient } from '@/db/supabase';
 import type {
   Profile,
   Transaction,
@@ -16,13 +18,16 @@ import type {
   Investment,
 } from '@/types/types';
 
+const client = () => getSupabaseClient();
+
 // Profile APIs
 export const getProfile = async (userId: string): Promise<Profile | null> => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.getProfile(userId);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
 
   if (error) throw error;
   return data;
@@ -32,6 +37,11 @@ export const updateProfile = async (
   userId: string,
   updates: Partial<Profile>
 ): Promise<Profile | null> => {
+  if (isDemoMode) {
+    return demoData.updateProfile(userId, updates);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('profiles')
     .update(updates)
@@ -48,6 +58,11 @@ export const getTransactions = async (
   userId: string,
   limit = 50
 ): Promise<Transaction[]> => {
+  if (isDemoMode) {
+    return demoData.getTransactions(userId, limit);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('transactions')
     .select('*')
@@ -63,11 +78,12 @@ export const getTransactions = async (
 export const createTransaction = async (
   transaction: Omit<Transaction, 'id' | 'created_at'>
 ): Promise<Transaction | null> => {
-  const { data, error } = await supabase
-    .from('transactions')
-    .insert(transaction)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createTransaction(transaction);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('transactions').insert(transaction).select().maybeSingle();
 
   if (error) throw error;
   return data;
@@ -77,6 +93,11 @@ export const updateTransaction = async (
   id: string,
   updates: Partial<Transaction>
 ): Promise<Transaction | null> => {
+  if (isDemoMode) {
+    return demoData.updateTransaction(id, updates);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('transactions')
     .update(updates)
@@ -89,6 +110,12 @@ export const updateTransaction = async (
 };
 
 export const deleteTransaction = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteTransaction(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('transactions').delete().eq('id', id);
 
   if (error) throw error;
@@ -103,6 +130,11 @@ export const getBalance = async (userId: string): Promise<number> => {
 
 // Bill APIs
 export const getBills = async (userId: string): Promise<Bill[]> => {
+  if (isDemoMode) {
+    return demoData.getBills(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('bills')
     .select('*')
@@ -117,11 +149,12 @@ export const getBills = async (userId: string): Promise<Bill[]> => {
 export const createBill = async (
   bill: Omit<Bill, 'id' | 'created_at'>
 ): Promise<Bill | null> => {
-  const { data, error } = await supabase
-    .from('bills')
-    .insert(bill)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createBill(bill);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('bills').insert(bill).select().maybeSingle();
 
   if (error) throw error;
   return data;
@@ -131,18 +164,24 @@ export const updateBill = async (
   id: string,
   updates: Partial<Bill>
 ): Promise<Bill | null> => {
-  const { data, error } = await supabase
-    .from('bills')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.updateBill(id, updates);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('bills').update(updates).eq('id', id).select().maybeSingle();
 
   if (error) throw error;
   return data;
 };
 
 export const deleteBill = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteBill(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('bills').delete().eq('id', id);
 
   if (error) throw error;
@@ -150,6 +189,11 @@ export const deleteBill = async (id: string): Promise<void> => {
 
 // Goal APIs
 export const getGoals = async (userId: string): Promise<Goal[]> => {
+  if (isDemoMode) {
+    return demoData.getGoals(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('goals')
     .select('*')
@@ -164,11 +208,12 @@ export const getGoals = async (userId: string): Promise<Goal[]> => {
 export const createGoal = async (
   goal: Omit<Goal, 'id' | 'created_at'>
 ): Promise<Goal | null> => {
-  const { data, error } = await supabase
-    .from('goals')
-    .insert(goal)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createGoal(goal);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('goals').insert(goal).select().maybeSingle();
 
   if (error) throw error;
   return data;
@@ -178,18 +223,24 @@ export const updateGoal = async (
   id: string,
   updates: Partial<Goal>
 ): Promise<Goal | null> => {
-  const { data, error } = await supabase
-    .from('goals')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.updateGoal(id, updates);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('goals').update(updates).eq('id', id).select().maybeSingle();
 
   if (error) throw error;
   return data;
 };
 
 export const deleteGoal = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteGoal(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('goals').delete().eq('id', id);
 
   if (error) throw error;
@@ -197,6 +248,11 @@ export const deleteGoal = async (id: string): Promise<void> => {
 
 // Advice History APIs
 export const getAdviceHistory = async (userId: string): Promise<AdviceHistory[]> => {
+  if (isDemoMode) {
+    return demoData.getAdviceHistory(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('advice_history')
     .select('*')
@@ -211,6 +267,11 @@ export const getAdviceHistory = async (userId: string): Promise<AdviceHistory[]>
 export const createAdviceHistory = async (
   advice: Omit<AdviceHistory, 'id' | 'created_at'>
 ): Promise<AdviceHistory | null> => {
+  if (isDemoMode) {
+    return demoData.createAdviceHistory(advice);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('advice_history')
     .insert(advice)
@@ -225,6 +286,11 @@ export const createAdviceHistory = async (
 export const getVoiceSmsHistory = async (
   userId: string
 ): Promise<VoiceSmsHistory[]> => {
+  if (isDemoMode) {
+    return demoData.getVoiceSmsHistory(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('voice_sms_history')
     .select('*')
@@ -239,6 +305,11 @@ export const getVoiceSmsHistory = async (
 export const createVoiceSmsHistory = async (
   history: Omit<VoiceSmsHistory, 'id' | 'created_at'>
 ): Promise<VoiceSmsHistory | null> => {
+  if (isDemoMode) {
+    return demoData.createVoiceSmsHistory(history);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('voice_sms_history')
     .insert(history)
@@ -251,6 +322,11 @@ export const createVoiceSmsHistory = async (
 
 // Safety Log APIs
 export const getSafetyLogs = async (userId: string): Promise<SafetyLog[]> => {
+  if (isDemoMode) {
+    return demoData.getSafetyLogs(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('safety_logs')
     .select('*')
@@ -265,11 +341,12 @@ export const getSafetyLogs = async (userId: string): Promise<SafetyLog[]> => {
 export const createSafetyLog = async (
   log: Omit<SafetyLog, 'id' | 'created_at'>
 ): Promise<SafetyLog | null> => {
-  const { data, error } = await supabase
-    .from('safety_logs')
-    .insert(log)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createSafetyLog(log);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('safety_logs').insert(log).select().maybeSingle();
 
   if (error) throw error;
   return data;
@@ -277,6 +354,11 @@ export const createSafetyLog = async (
 
 // Alert APIs
 export const getAlerts = async (userId: string): Promise<Alert[]> => {
+  if (isDemoMode) {
+    return demoData.getAlerts(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('alerts')
     .select('*')
@@ -289,6 +371,11 @@ export const getAlerts = async (userId: string): Promise<Alert[]> => {
 };
 
 export const getUnreadAlerts = async (userId: string): Promise<Alert[]> => {
+  if (isDemoMode) {
+    return demoData.getUnreadAlerts(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('alerts')
     .select('*')
@@ -304,17 +391,24 @@ export const getUnreadAlerts = async (userId: string): Promise<Alert[]> => {
 export const createAlert = async (
   alert: Omit<Alert, 'id' | 'created_at'>
 ): Promise<Alert | null> => {
-  const { data, error } = await supabase
-    .from('alerts')
-    .insert(alert)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createAlert(alert);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('alerts').insert(alert).select().maybeSingle();
 
   if (error) throw error;
   return data;
 };
 
 export const markAlertAsRead = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.markAlertAsRead(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase
     .from('alerts')
     .update({ is_read: true })
@@ -324,6 +418,12 @@ export const markAlertAsRead = async (id: string): Promise<void> => {
 };
 
 export const deleteAlert = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteAlert(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('alerts').delete().eq('id', id);
 
   if (error) throw error;
@@ -331,6 +431,11 @@ export const deleteAlert = async (id: string): Promise<void> => {
 
 // Monthly Report APIs
 export const getMonthlyReports = async (userId: string): Promise<MonthlyReport[]> => {
+  if (isDemoMode) {
+    return demoData.getMonthlyReports(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('monthly_reports')
     .select('*')
@@ -346,6 +451,11 @@ export const getMonthlyReport = async (
   userId: string,
   month: string
 ): Promise<MonthlyReport | null> => {
+  if (isDemoMode) {
+    return demoData.getMonthlyReport(userId, month);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('monthly_reports')
     .select('*')
@@ -360,6 +470,11 @@ export const getMonthlyReport = async (
 export const createMonthlyReport = async (
   report: Omit<MonthlyReport, 'id' | 'created_at'>
 ): Promise<MonthlyReport | null> => {
+  if (isDemoMode) {
+    return demoData.createMonthlyReport(report);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('monthly_reports')
     .insert(report)
@@ -372,6 +487,11 @@ export const createMonthlyReport = async (
 
 // Receipt APIs
 export const getReceipts = async (userId: string): Promise<Receipt[]> => {
+  if (isDemoMode) {
+    return demoData.getReceipts(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('receipts')
     .select('*')
@@ -386,17 +506,24 @@ export const getReceipts = async (userId: string): Promise<Receipt[]> => {
 export const createReceipt = async (
   receipt: Omit<Receipt, 'id' | 'created_at'>
 ): Promise<Receipt | null> => {
-  const { data, error } = await supabase
-    .from('receipts')
-    .insert(receipt)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createReceipt(receipt);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('receipts').insert(receipt).select().maybeSingle();
 
   if (error) throw error;
   return data;
 };
 
 export const deleteReceipt = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteReceipt(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('receipts').delete().eq('id', id);
 
   if (error) throw error;
@@ -404,6 +531,11 @@ export const deleteReceipt = async (id: string): Promise<void> => {
 
 // Budget Plan APIs
 export const getBudgetPlans = async (userId: string): Promise<BudgetPlan[]> => {
+  if (isDemoMode) {
+    return demoData.getBudgetPlans(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('budget_plans')
     .select('*')
@@ -418,11 +550,12 @@ export const getBudgetPlans = async (userId: string): Promise<BudgetPlan[]> => {
 export const createBudgetPlan = async (
   plan: Omit<BudgetPlan, 'id' | 'created_at'>
 ): Promise<BudgetPlan | null> => {
-  const { data, error } = await supabase
-    .from('budget_plans')
-    .insert(plan)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createBudgetPlan(plan);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('budget_plans').insert(plan).select().maybeSingle();
 
   if (error) throw error;
   return data;
@@ -432,6 +565,11 @@ export const createBudgetPlan = async (
 export const getSpendingForecasts = async (
   userId: string
 ): Promise<SpendingForecast[]> => {
+  if (isDemoMode) {
+    return demoData.getSpendingForecasts(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('spending_forecasts')
     .select('*')
@@ -446,6 +584,11 @@ export const getSpendingForecasts = async (
 export const createSpendingForecast = async (
   forecast: Omit<SpendingForecast, 'id' | 'created_at'>
 ): Promise<SpendingForecast | null> => {
+  if (isDemoMode) {
+    return demoData.createSpendingForecast(forecast);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('spending_forecasts')
     .insert(forecast)
@@ -458,6 +601,11 @@ export const createSpendingForecast = async (
 
 // Family Member APIs
 export const getFamilyMembers = async (userId: string): Promise<FamilyMember[]> => {
+  if (isDemoMode) {
+    return demoData.getFamilyMembers(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('family_members')
     .select('*')
@@ -472,6 +620,11 @@ export const getFamilyMembers = async (userId: string): Promise<FamilyMember[]> 
 export const createFamilyMember = async (
   member: Omit<FamilyMember, 'id' | 'created_at'>
 ): Promise<FamilyMember | null> => {
+  if (isDemoMode) {
+    return demoData.createFamilyMember(member);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('family_members')
     .insert(member)
@@ -486,6 +639,11 @@ export const updateFamilyMember = async (
   id: string,
   updates: Partial<FamilyMember>
 ): Promise<FamilyMember | null> => {
+  if (isDemoMode) {
+    return demoData.updateFamilyMember(id, updates);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('family_members')
     .update(updates)
@@ -498,6 +656,12 @@ export const updateFamilyMember = async (
 };
 
 export const deleteFamilyMember = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteFamilyMember(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('family_members').delete().eq('id', id);
 
   if (error) throw error;
@@ -505,6 +669,11 @@ export const deleteFamilyMember = async (id: string): Promise<void> => {
 
 // Investment APIs
 export const getInvestments = async (userId: string): Promise<Investment[]> => {
+  if (isDemoMode) {
+    return demoData.getInvestments(userId);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('investments')
     .select('*')
@@ -519,11 +688,12 @@ export const getInvestments = async (userId: string): Promise<Investment[]> => {
 export const createInvestment = async (
   investment: Omit<Investment, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Investment | null> => {
-  const { data, error } = await supabase
-    .from('investments')
-    .insert(investment)
-    .select()
-    .maybeSingle();
+  if (isDemoMode) {
+    return demoData.createInvestment(investment);
+  }
+
+  const supabase = client();
+  const { data, error } = await supabase.from('investments').insert(investment).select().maybeSingle();
 
   if (error) throw error;
   return data;
@@ -533,6 +703,11 @@ export const updateInvestment = async (
   id: string,
   updates: Partial<Investment>
 ): Promise<Investment | null> => {
+  if (isDemoMode) {
+    return demoData.updateInvestment(id, updates);
+  }
+
+  const supabase = client();
   const { data, error } = await supabase
     .from('investments')
     .update(updates)
@@ -545,6 +720,12 @@ export const updateInvestment = async (
 };
 
 export const deleteInvestment = async (id: string): Promise<void> => {
+  if (isDemoMode) {
+    demoData.deleteInvestment(id);
+    return;
+  }
+
+  const supabase = client();
   const { error } = await supabase.from('investments').delete().eq('id', id);
 
   if (error) throw error;

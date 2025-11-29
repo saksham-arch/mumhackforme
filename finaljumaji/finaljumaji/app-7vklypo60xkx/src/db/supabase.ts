@@ -1,8 +1,21 @@
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { hasSupabaseCredentials, isDemoMode } from '@/config/demo';
 
-            import { createClient } from "@supabase/supabase-js";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+let supabaseClient: SupabaseClient | null = null;
 
-            export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-            
+if (!isDemoMode && hasSupabaseCredentials && supabaseUrl && supabaseAnonKey) {
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+}
+
+export const getSupabaseClient = () => {
+  if (!supabaseClient) {
+    throw new Error('Supabase client is not configured.');
+  }
+
+  return supabaseClient;
+};
+
+export const supabase = supabaseClient;

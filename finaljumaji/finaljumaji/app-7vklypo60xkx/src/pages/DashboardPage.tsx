@@ -477,7 +477,7 @@ export default function DashboardPage() {
               Me
             </Button>
 
-            <Button className="gap-2" onClick={() => navigate('/money')}>
+            <Button className="gap-2" onClick={() => navigate('/my-money')}>
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Add Transaction</span>
             </Button>
